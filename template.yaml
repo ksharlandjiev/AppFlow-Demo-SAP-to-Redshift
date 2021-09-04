@@ -683,85 +683,85 @@ Resources:
 
 
 
-  AppFlowPullDefinition:
-    DependsOn: SourceBucket
-    Type: AWS::AppFlow::Flow
-    Properties: 
-      FlowName: !Ref PullFlowName
-      KMSArn: !GetAtt KSMKey.Arn    
-      DestinationFlowConfigList:
-      - ConnectorType: S3
-        DestinationConnectorProperties:
-          S3:
-            BucketName: !Ref SourceBucket
-            S3OutputFormatConfig:
-              FileType: CSV
+  # AppFlowPullDefinition:
+  #   DependsOn: SourceBucket
+  #   Type: AWS::AppFlow::Flow
+  #   Properties: 
+  #     FlowName: !Ref PullFlowName
+  #     KMSArn: !GetAtt KSMKey.Arn    
+  #     DestinationFlowConfigList:
+  #     - ConnectorType: S3
+  #       DestinationConnectorProperties:
+  #         S3:
+  #           BucketName: !Ref SourceBucket
+  #           S3OutputFormatConfig:
+  #             FileType: CSV
 
-      SourceFlowConfig: 
-          ConnectorProfileName: !Ref PullFlowConnectorName
-          ConnectorType: SAPOData
-          SourceConnectorProperties:
-              SAPOData: 
-                objectPath: "/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder"
+  #     SourceFlowConfig: 
+  #         ConnectorProfileName: !Ref PullFlowConnectorName
+  #         ConnectorType: SAPOData
+  #         SourceConnectorProperties:
+  #             SAPOData: 
+  #               objectPath: "/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder"
 
-      Tasks:
-      - ConnectorOperator:
-          SAPOData: PROJECTION
+  #     Tasks:
+  #     - ConnectorOperator:
+  #         SAPOData: PROJECTION
       
-        SourceFields:
-        - SalesOrder
-        - SalesOrderType
-        - SalesOrganization
-        - DistributionChannel
-        - OrganizationDivision
-        - SalesGroup
-        - SalesOffice
-        - SalesDistrict
-        - SoldToParty
-        - CreationDate
-        - CreatedByUser
-        - LastChangeDate
-        - LastChangeDateTime
-        - PurchaseOrderByCustomer
-        - CustomerPurchaseOrderType
-        - CustomerPurchaseOrderDate
-        - SalesOrderDate
-        - TotalNetAmount
-        - TransactionCurrency
-        - SDDocumentReason
-        - PricingDate
-        - RequestedDeliveryDate
-        - ShippingCondition
-        - CompleteDeliveryIsDefined
-        - ShippingType
-        - HeaderBillingBlockReason
-        - DeliveryBlockReason
-        - IncotermsClassification
-        - IncotermsTransferLocation
-        - IncotermsLocation1
-        - IncotermsLocation2
-        - IncotermsVersion
-        - CustomerPaymentTerms
-        - PaymentMethod
-        - AssignmentReference
-        - ReferenceSDDocument
-        - ReferenceSDDocumentCategory
-        - CustomerTaxClassification1
-        - TaxDepartureCountry
-        - VATRegistrationCountry
-        - SalesOrderApprovalReason
-        - SalesDocApprovalStatus
-        - OverallSDProcessStatus
-        - TotalCreditCheckStatus
-        - OverallTotalDeliveryStatus
-        - OverallSDDocumentRejectionSts
-        TaskType: Filter
+  #       SourceFields:
+  #       - SalesOrder
+  #       - SalesOrderType
+  #       - SalesOrganization
+  #       - DistributionChannel
+  #       - OrganizationDivision
+  #       - SalesGroup
+  #       - SalesOffice
+  #       - SalesDistrict
+  #       - SoldToParty
+  #       - CreationDate
+  #       - CreatedByUser
+  #       - LastChangeDate
+  #       - LastChangeDateTime
+  #       - PurchaseOrderByCustomer
+  #       - CustomerPurchaseOrderType
+  #       - CustomerPurchaseOrderDate
+  #       - SalesOrderDate
+  #       - TotalNetAmount
+  #       - TransactionCurrency
+  #       - SDDocumentReason
+  #       - PricingDate
+  #       - RequestedDeliveryDate
+  #       - ShippingCondition
+  #       - CompleteDeliveryIsDefined
+  #       - ShippingType
+  #       - HeaderBillingBlockReason
+  #       - DeliveryBlockReason
+  #       - IncotermsClassification
+  #       - IncotermsTransferLocation
+  #       - IncotermsLocation1
+  #       - IncotermsLocation2
+  #       - IncotermsVersion
+  #       - CustomerPaymentTerms
+  #       - PaymentMethod
+  #       - AssignmentReference
+  #       - ReferenceSDDocument
+  #       - ReferenceSDDocumentCategory
+  #       - CustomerTaxClassification1
+  #       - TaxDepartureCountry
+  #       - VATRegistrationCountry
+  #       - SalesOrderApprovalReason
+  #       - SalesDocApprovalStatus
+  #       - OverallSDProcessStatus
+  #       - TotalCreditCheckStatus
+  #       - OverallTotalDeliveryStatus
+  #       - OverallSDDocumentRejectionSts
+  #       TaskType: Filter
 
-      - TaskType: Map_all
+  #     - TaskType: Map_all
       
-        SourceFields: []
-        ConnectorOperator:
-          SAPOData: NO_OP
+  #       SourceFields: []
+  #       ConnectorOperator:
+  #         SAPOData: NO_OP
 
-      TriggerConfig:
-        TriggerType: OnDemand
+  #     TriggerConfig:
+  #       TriggerType: OnDemand
