@@ -26,7 +26,7 @@ Parameters:
   S3BucketName:
     Description: The S3 bucket used by AppFlow to save data from SAP
     Type: String
-    Default: vsp-datalake01
+    Default: vsp-demo-datalake
 
   PullFlowName:
     Description: The name of the  Flow to ingest data from SAP
@@ -47,6 +47,10 @@ Parameters:
     Description: The name of the desitnation connector
     Type: String
     Default: redshift
+  
+  RedshiftConnectorBucketName:
+    Description: The name of the S3 bucket used by the Redshift connector where Amazon AppFlow will first write the data before copying it.
+    Type: String
 
 Resources:
   AppFlowLambdaTrigger:
@@ -57,31 +61,32 @@ Resources:
       Runtime: nodejs12.x
       Policies: # For PRODUCTION you may want to recify the permission boundries. At the moment the lambda function will have access to all S3 buckets and SQS queues. 
         - AmazonAppFlowFullAccess
-      
-  IntermediateBucket:
-    Type: "AWS::S3::Bucket"
+  
+  # We don't need this unless we create Redshift connector here. Instead the user needs to specify the s3 bucket used when creating the connector. 
+  # IntermediateBucket:
+  #   Type: "AWS::S3::Bucket"
 
-  IntermediateBucketPolicy:
-    Type: "AWS::S3::BucketPolicy"
-    Properties: 
-      Bucket: !Ref IntermediateBucket
-      PolicyDocument:
-        Version: "2012-10-17"
-        Version: '2008-10-17'
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service: appflow.amazonaws.com
-          Action:
-          - s3:PutObject
-          - s3:AbortMultipartUpload
-          - s3:ListMultipartUploadParts
-          - s3:ListBucketMultipartUploads
-          - s3:GetBucketAcl
-          - s3:PutObjectAcl
-          Resource:
-          - !Sub arn:aws:s3:::${IntermediateBucket}
-          - !Sub arn:aws:s3:::${IntermediateBucket}/*     
+  # IntermediateBucketPolicy:
+  #   Type: "AWS::S3::BucketPolicy"
+  #   Properties: 
+  #     Bucket: !Ref IntermediateBucket
+  #     PolicyDocument:
+  #       Version: "2012-10-17"
+  #       Version: '2008-10-17'
+  #       Statement:
+  #       - Effect: Allow
+  #         Principal:
+  #           Service: appflow.amazonaws.com
+  #         Action:
+  #         - s3:PutObject
+  #         - s3:AbortMultipartUpload
+  #         - s3:ListMultipartUploadParts
+  #         - s3:ListBucketMultipartUploads
+  #         - s3:GetBucketAcl
+  #         - s3:PutObjectAcl
+  #         Resource:
+  #         - !Sub arn:aws:s3:::${IntermediateBucket}
+  #         - !Sub arn:aws:s3:::${IntermediateBucket}/*     
 
   SourceBucket:
     Type: "AWS::S3::Bucket"
@@ -173,6 +178,12 @@ Resources:
             StringEquals:
               kms:CallerAccount: !Sub "${AWS::AccountId}"
               kms:ViaService: !Sub "secretsmanager.${AWS::Region}.amazonaws.com"
+  # Log Group to subscribed to eventBridge
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "events/appflow"
+      RetentionInDays: 1
 
   EventRule: 
     Type: AWS::Events::Rule
@@ -186,10 +197,11 @@ Resources:
         detail:
           flow-name:
           - !Ref PullFlowName
-
       Targets: 
         - Arn: !GetAtt AppFlowLambdaTrigger.Arn
           Id: "AppFlowLambdaTrigger"              
+        - Arn: !GetAtt LogGroup.Arn
+          Id: "lg"      
 
   AppFlowPushDefinition:
     DependsOn: SourceBucket
@@ -204,7 +216,7 @@ Resources:
         ConnectorType: S3
         SourceConnectorProperties:
           S3:
-            BucketName: !Ref S3BucketName
+            BucketName: !Ref SourceBucket
             BucketPrefix: !Sub "${PullFlowName}/"
 
       DestinationFlowConfigList:
@@ -212,7 +224,7 @@ Resources:
         ConnectorType: Redshift
         DestinationConnectorProperties:
           Redshift:
-            IntermediateBucketName: redshift-appflow-bucket-437909331493-us-east-1
+            IntermediateBucketName: !Ref RedshiftConnectorBucketName
             Object: public.orders
 
       Tasks:
@@ -683,6 +695,7 @@ Resources:
 
 
 
+        
   # AppFlowPullDefinition:
   #   DependsOn: SourceBucket
   #   Type: AWS::AppFlow::Flow

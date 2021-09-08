@@ -2,9 +2,10 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "SAP-to-Redshift"
-s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-5wuocbxczilg"
-s3_prefix = "SAP-to-Redshift"
+stack_name = "sap-redshift"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1nsra1z6oe0en"
+s3_prefix = "sap-redshift"
 region = "us-east-1"
+profile = "default1"
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "CloudWatchLogLevel=\"ERROR\" S3BucketName=\"vsp-datalake01\" PullFlowName=\"sap-to-s3\" PushFlowName=\"s3-to-redshift\" PullFlowConnectorName=\"SAP\" PushFlowConnectorName=\"redshift\""
+parameter_overrides = "CloudWatchLogLevel=\"ERROR\" S3BucketName=\"vsp-demo-datalake02\" RedshiftConnectorBucketName=\"redshift-s3-awskamen\" PullFlowName=\"sap-to-s3\" PushFlowName=\"s3-to-redshift\" PullFlowConnectorName=\"SAP\" PushFlowConnectorName=\"redshift\""
